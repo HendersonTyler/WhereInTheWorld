@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Container from '@material-ui/core/Container';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { makeStyles } from '@material-ui/core/styles';
@@ -8,6 +8,8 @@ import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
 import ReactStreetview from 'react-streetview';
 import locations from './Locations';
+import TextField from '@material-ui/core/TextField';
+import Autocomplete from '@material-ui/lab/Autocomplete';
 
 const useStyles = makeStyles({
     root: {
@@ -16,20 +18,36 @@ const useStyles = makeStyles({
       },
   });
 
-const randomNumber = Math.floor(Math.random() * 6);
+function round(num){
+    return Math.round((num + Number.EPSILON) * 10000) / 10000;
+}
+
+const randomLocation = Math.floor(Math.random() * 6);
+
+function latLong() {
+    const lat = locations[randomLocation][1] + Math.random() * (0.0099 - 0.0001) + 0.0001;
+    const long = locations[randomLocation][2] + Math.random() * (0.0099 - 0.0001) + 0.0001;
+    return {lat: round(lat), lng: round(long)};
+}
 
 const streetViewPanoramaOptions = {
-    position: locations[randomNumber][1],
+    position: latLong(),
+    preference: 'nearest',
+    radius: '5000',
+    source: 'outdoor',
     pov: {heading: 100, pitch: 0},
     zoom: 1,
     disableDefaultUI: true,
     showRoadLabels: false,
-    clickToGo: false
+    clickToGo: false,
     };
 
 const App = () => {
+    const [userGuess, setUserGuess] = useState();
+
     const classes = useStyles();
-    console.log(locations[randomNumber][0])
+    console.log(locations[randomLocation][0])
+    console.log(streetViewPanoramaOptions.position)
     return (
         <>
             <div id="map" style={{width: '100vw', height: '100vh', position: 'absolute', zIndex: '1'}}>
@@ -50,15 +68,25 @@ const App = () => {
                             <br/>
                         Can you guess which city you are in?
                         </Typography>
-                        <Typography variant="body2" component="p">
-                            <br/>
-                        {locations[randomNumber][0]}
-                        </Typography>
 
                         <br/>
-                        <div style={{textAlign: 'center'}}>
-                            <Button variant="contained">Let's Play</Button>
-                        </div>
+                        <form onSubmit={e => {
+                            e.preventDefault();
+                            console.log(userGuess);
+                        }}>
+                            <Autocomplete
+                                id="city-box"
+                                options={locations}
+                                onChange={e => setUserGuess(e.target.firstChild.data)}
+                                getOptionLabel={(option) => option[0]}
+                                style={{ width: 300 }}
+                                renderInput={(params) => <TextField {...params} label="City" variant="outlined" onChange={e => setUserGuess(e.target.value)} />}
+                                />
+                            <br />
+                            <div style={{textAlign: 'center'}}>
+                                <Button type="submit" variant="contained">Submit</Button>
+                            </div>
+                        </form>
                     </CardContent>                    
                 </Card>
             </Container>
