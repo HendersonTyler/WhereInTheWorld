@@ -16,12 +16,6 @@
     "react-streetview": "^1.1.1",
     "web-vitals": "^0.2.4"
   },
-  // "scripts": {
-  //   "start": "react-scripts start",
-  //   "build": "react-scripts build",
-  //   "test": "react-scripts test",
-  //   "eject": "react-scripts eject"
-  // },
   "scripts": {
     "heroku-prebuild": "npm install -g serve",
     "devstart": "react-scripts start",
